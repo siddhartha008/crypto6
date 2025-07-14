@@ -56,7 +56,7 @@ Here's a walkthrough of implemented user stories:
 
 <img src='./src/assets/proj6.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
-GIF created with ...\
+GIF created with 
 Screenrecorded with Quicktime Player and converted to gif
 
 ## Notes
