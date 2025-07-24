@@ -1,20 +1,18 @@
 import React from "react";
 import { LucideHeart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 
 const MainDashboard = ({
   setWatchList,
   watchList,
   searchInput,
   setSearchInput,
-  setSearchSymbol,
-  foundCoin,
+  setSearchSymbol, // not used for real-time search
+  foundCoin, // not used for real-time search
+  setFoundCoin, // need to add this prop in App.jsx
   cryptoList
 }) => {
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setSearchSymbol(searchInput.trim());
-  };
-
   const isWatched = (coin) => watchList && watchList.some((c) => c.id === coin.id);
 
   const toggleWatchList = (coin) => {
@@ -34,6 +32,22 @@ const MainDashboard = ({
   const minPrice = prices.length ? Math.min(...prices).toFixed(7) : 0;
   const maxPrice = prices.length ? Math.max(...prices).toFixed(10) :0;
 
+  // Top 10 by market cap and volume
+  const top10MarketCap = [...cryptoList]
+    .sort((a, b) => parseFloat(b.market_cap_usd) - parseFloat(a.market_cap_usd))
+    .slice(0, 10);
+
+  // Pie chart: Top 5 coins' share of total market cap
+  const top5MarketCap = top10MarketCap.slice(0, 5);
+  const totalMarketCap = top5MarketCap.reduce((sum, c) => sum + parseFloat(c.market_cap_usd), 0);
+  const pieData = top5MarketCap.map(c => ({ name: c.symbol, value: parseFloat(c.market_cap_usd) }));
+  const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#8dd1e1'];
+  const top10Volume = [...cryptoList]
+    .sort((a, b) => parseFloat(b.volume24) - parseFloat(a.volume24))
+    .slice(0, 10);
+
+  const navigate = useNavigate();
+
   // Price range slider filter (logarithmic)
   function log10(x) { return Math.log10(x); }
   function pow10(x) { return Math.pow(10, x); }
@@ -46,6 +60,20 @@ const MainDashboard = ({
 
   // Alphabet character range filter
   const [alphaRange, setAlphaRange] = React.useState({ start: '', end: '' });
+
+  // Real-time search effect
+  React.useEffect(() => {
+    if (searchInput.trim() === "") {
+      setFoundCoin(null);
+      return;
+    }
+    const coin = cryptoList.find(c => c.symbol.toUpperCase() === searchInput.trim().toUpperCase());
+    if (coin) {
+      setFoundCoin(coin);
+    } else {
+      setFoundCoin(null);
+    }
+  }, [searchInput, cryptoList, setFoundCoin]);
 
   // Filtered crypto list by price range and first letter range
   const filteredCryptoList = cryptoList.filter(coin => {
@@ -68,18 +96,16 @@ const MainDashboard = ({
     return matchesPrice && matchesAlpha;
   });
 
-
   return (
     <div className="main-dashboard-container">
-      <form onSubmit={handleSearch} className="search-form">
+      <div className="search-form">
         <input
           type="text"
           placeholder="Enter symbol for the crypto"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
         />
-        <button type="submit">Search</button>
-      </form>
+      </div>
 
       <div className="dashboard-summary-stats" style={{ display: 'flex', gap: '2rem', justifyContent: 'center', marginBottom: '1.5rem' }}>
         <div><strong>Total Cryptos:</strong> {totalCount}</div>
@@ -139,6 +165,9 @@ const MainDashboard = ({
         </div>
       </div>
 
+      {searchInput.trim() !== "" && !foundCoin ? (
+        <p>No coin found for symbol "{searchInput}"</p>
+      ) : null}
       {foundCoin ? (
         <div className="coin-details">
           <button onClick={() => toggleWatchList(foundCoin)} style={{background: 'none', border: 'none', cursor: 'pointer'}}>
@@ -149,9 +178,51 @@ const MainDashboard = ({
           <p>24h Volume: ${foundCoin.volume24}</p>
           <p>Market Cap: ${foundCoin.market_cap_usd}</p>
         </div>
-      ) : searchInput ? (
-        <p>No coin found for symbol "{searchInput}"</p>
       ) : null}
+
+      {/* Charts Row */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'center', marginBottom: '2.5rem' }}>
+        {/* Bar Chart: Top 10 by Market Cap */}
+        <div style={{ background: '#fff', borderRadius: 12, padding: 16, minWidth: 350, maxWidth: 500, flex: 1 }}>
+          <h3 style={{ textAlign: 'center', marginBottom: 8 }}>Top 10 Cryptos by Market Cap</h3>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={top10MarketCap} layout="vertical" margin={{ top: 10, right: 30, left: 30, bottom: 10 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" tickFormatter={v => `$${(+v).toLocaleString()}`}/>
+              <YAxis type="category" dataKey="name" width={120} />
+              <Tooltip formatter={v => `$${(+v).toLocaleString()}`}/>
+              <Legend />
+              <Bar dataKey="market_cap_usd" fill="#8884d8" barSize={22} name="Market Cap (USD)" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        {/* Pie Chart: Top 5 Market Cap Share */}
+        <div style={{ background: '#fff', borderRadius: 12, padding: 16, minWidth: 350, maxWidth: 400, flex: 1 }}>
+          <h3 style={{ textAlign: 'center', marginBottom: 8 }}>Top 5 Market Cap Share</h3>
+          <ResponsiveContainer width="100%" height={280}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={90}
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+              >
+                {pieData.map((entry, idx) => (
+                  <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={v => `$${(+v).toLocaleString()}`}/>
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+          <div style={{ textAlign: 'center', marginTop: 8, color: '#444' }}>
+            Total Market Cap (Top 5): <b>${totalMarketCap.toLocaleString()}</b>
+          </div>
+        </div>
+      </div>
 
       <div className="crypto-table-container">
         <table className="crypto-table">
@@ -168,9 +239,9 @@ const MainDashboard = ({
           <tbody>
             {filteredCryptoList.map(coin => { 
               return (
-                <tr key={coin.id}>
+                <tr key={coin.id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/coin/${coin.id}`)}>
                   <td>
-                    <button onClick={() => toggleWatchList(coin)} style={{background: 'none', border: 'none', cursor: 'pointer'}}>
+                    <button onClick={e => { e.stopPropagation(); toggleWatchList(coin); }} style={{background: 'none', border: 'none', cursor: 'pointer'}}>
                       <LucideHeart size={20} color={isWatched(coin) ? "rgb(18, 71, 35)" : "white"} fill={isWatched(coin) ? "rgb(18, 71, 35)" : "none"} />
                     </button>
                   </td>

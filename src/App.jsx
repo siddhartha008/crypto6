@@ -4,6 +4,10 @@ import './App.css'
 import MainDashboard from './components/mainDashbaord/mainDashboard.jsx';
 import TopCrypto from './components/Header/Top/topCrypto.jsx';
 import Watching from './components/Header/Watching/watching.jsx';
+import SearchPage from './components/SearchPage.jsx';
+import AboutUs from './components/AboutUs.jsx';
+import CoinDetail from './components/CoinDetail.jsx';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 function App() {
   const [watchList, setWatchList] = useState([]);
@@ -57,26 +61,42 @@ function App() {
   }, []);
 
   return (
-    <div>
-        <div className='header'>
-          <TopCrypto 
-            topCrypto={cryptoList.length > 0 ? `${cryptoList[0].name} (${cryptoList[0].symbol})` : ''}
-            price={cryptoList.length > 0 ? cryptoList[0].price_usd : ''}
-          />
-          <Watching watchList={watchList} />
-        </div>
-        <MainDashboard  
-          watchList={watchList}
-          setWatchList={setWatchList}
-          searchInput={searchInput}
-          setSearchInput={setSearchInput}
-          searchSymbol={searchSymbol}
-          setSearchSymbol={setSearchSymbol}
-          foundCoin={foundCoin}
-          setFoundCoin={setFoundCoin}
-          cryptoList={cryptoList}
-        />
-    </div>
+    <Router>
+      <div>
+        <nav style={{ padding: '1rem', background: '#f5f5f5' }}>
+          <Link to="/" style={{ marginRight: '1rem' }}>Dashboard</Link>
+          <Link to="/search" style={{ marginRight: '1rem' }}>Search</Link>
+          <Link to="/about">About</Link>
+        </nav>
+        <Routes>
+          <Route path="/" element={
+            <>
+              <div className='header'>
+                <TopCrypto 
+                  topCrypto={cryptoList.length > 0 ? `${cryptoList[0].name} (${cryptoList[0].symbol})` : ''}
+                  price={cryptoList.length > 0 ? cryptoList[0].price_usd : ''}
+                />
+                <Watching watchList={watchList} />
+              </div>
+              <MainDashboard  
+                watchList={watchList}
+                setWatchList={setWatchList}
+                searchInput={searchInput}
+                setSearchInput={setSearchInput}
+                searchSymbol={searchSymbol}
+                setSearchSymbol={setSearchSymbol}
+                foundCoin={foundCoin}
+                setFoundCoin={setFoundCoin}
+                cryptoList={cryptoList}
+              />
+            </>
+          } />
+          <Route path="/search" element={<SearchPage cryptoList={cryptoList} />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/coin/:id" element={<CoinDetail cryptoList={cryptoList} />} />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 

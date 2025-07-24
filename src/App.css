@@ -1,4 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  font-family: 'Poppins', Arial, Helvetica, sans-serif;
+}
 
 body {
   min-height: 100vh;
@@ -12,7 +21,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem
+  padding: 1rem 2rem;
   border-radius: 20px;
   margin-bottom: 2rem;
 }
