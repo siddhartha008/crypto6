@@ -39,6 +39,7 @@ GIF created with ...
 ## Notes
 
 Describe any challenges encountered while building the app.
+- The charts were a bit difficult to work with.
 
 ## License
 
