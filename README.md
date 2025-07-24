@@ -22,24 +22,11 @@ The following **required** functionality is completed:
   - Each chart should describe a different aspect of the dataset
 
 
-The following **optional** features are implemented:
-
-- [ ] The site’s customized dashboard contains more content that explains what is interesting about the data 
-  - e.g., an additional description, graph annotation, suggestion for which filters to use, or an additional page that explains more about the data
-- [ ] The site allows users to toggle between different data visualizations
-  - User should be able to use some mechanism to toggle between displaying and hiding visualizations 
-
-  
-The following **additional** features are implemented:
-
-* [ ] List anything else that you added to improve the site's functionality!
-
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
-
+<img src='./src/assets/proj6.gif'
 <!-- Replace this with whatever GIF tool you used! -->
 GIF created with ...  
 <!-- Recommended tools:
