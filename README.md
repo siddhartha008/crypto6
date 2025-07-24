@@ -22,11 +22,13 @@ The following **required** functionality is completed:
   - Each chart should describe a different aspect of the dataset
 
 
+
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='./src/assets/proj6.gif'
+<img src='./src/assets/proj6.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
 <!-- Replace this with whatever GIF tool you used! -->
 GIF created with ...  
 <!-- Recommended tools:
